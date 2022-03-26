@@ -96,6 +96,18 @@ def is_assignment_complete(state: State):  # check if all variables are assigned
     return True
 
 
+def MRV_HEURISTIC():
+    pass
+
+
+def LCV_HEURISTIC():
+    pass
+
+
+def FORWARD_CHECKING():
+    pass
+
+
 def is_consistent(state: State):
     return check_Adjancy_Limit(state) and check_circles_limit(state) and is_unique(state)
 
