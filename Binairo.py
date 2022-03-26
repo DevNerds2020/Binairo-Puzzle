@@ -96,15 +96,15 @@ def is_assignment_complete(state: State):  # check if all variables are assigned
     return True
 
 
-def MRV_HEURISTIC():
+def MRV_HEURISTIC(state: State):
     pass
 
 
-def LCV_HEURISTIC():
+def LCV_HEURISTIC(state: State):
     pass
 
 
-def FORWARD_CHECKING():
+def FORWARD_CHECKING(state: State):
     pass
 
 
