@@ -1,3 +1,4 @@
+import random
 from copy import deepcopy
 import math
 import State
@@ -106,6 +107,38 @@ def LCV_HEURISTIC(state: State):
 
 def FORWARD_CHECKING(state: State):
     pass
+
+
+def check_constraints(state: State):
+    if check_Adjancy_Limit(state) and check_circles_limit(state) and is_unique(state):
+        return True
+    return False
+
+
+def backtracking_search(state: State):
+    stack = []
+    queue = []
+    for row in state.board:
+        for cell in row:
+            if cell.value == '_':
+                queue.append(cell)
+    while True:
+        print("1")
+        if is_assignment_complete(state):
+            state.print_board()
+            break
+        cell = queue.pop(0)
+        # print(cell.x, cell.y)
+        cell.value = random.choice(cell.domain)
+        if not check_constraints(state):
+            cell.change_color()
+            if not check_constraints(state):
+                cell = stack.pop(-1)
+                queue.insert(0, cell)
+            else:
+                stack.append(cell)
+        else:
+            stack.append(cell)
 
 
 def is_consistent(state: State):

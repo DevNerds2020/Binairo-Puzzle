@@ -40,6 +40,7 @@ def main():
     state.print_board()
     start_time = time()
     # backTrack(state)   implement backTrack and other csp functions in Binairo.py
+    backtracking_search(state)
     end_time = time()
     print('time: ', end_time - start_time)
 
