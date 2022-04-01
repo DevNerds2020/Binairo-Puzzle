@@ -2,6 +2,7 @@ import random
 from copy import deepcopy
 import math
 import State
+import Cell
 
 
 def check_Adjancy_Limit(state: State):
@@ -109,10 +110,28 @@ def FORWARD_CHECKING(state: State):
     pass
 
 
-def check_constraints(state: State):
+def check_constraints(state: State, var, value):
+    var.value = value
     if check_Adjancy_Limit(state) and check_circles_limit(state) and is_unique(state):
         return True
     return False
+
+
+"""
+
+"""
+
+
+def recursive_backtracking(state, queue):
+    if is_assignment_complete(state):
+        state.print_board()
+        return
+    var = queue.pop(0)
+    for value in var.domain:
+        if check_constraints(state, var, value):
+            recursive_backtracking(state, queue)
+        # if not check_constraints(state, var, value):
+        #     var.domain.remove(value)
 
 
 def backtracking_search(state: State):
@@ -122,23 +141,7 @@ def backtracking_search(state: State):
         for cell in row:
             if cell.value == '_':
                 queue.append(cell)
-    while True:
-        print("1")
-        if is_assignment_complete(state):
-            state.print_board()
-            break
-        cell = queue.pop(0)
-        # print(cell.x, cell.y)
-        cell.value = random.choice(cell.domain)
-        if not check_constraints(state):
-            cell.change_color()
-            if not check_constraints(state):
-                cell = stack.pop(-1)
-                queue.insert(0, cell)
-            else:
-                stack.append(cell)
-        else:
-            stack.append(cell)
+    recursive_backtracking(state, queue)
 
 
 def is_consistent(state: State):
