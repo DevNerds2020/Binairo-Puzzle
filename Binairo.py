@@ -121,62 +121,35 @@ def check_constraints(state: State):
 """
 
 
-def recursive_backtracking(state, stack):
-    # # if is_assignment_complete(state):
-    # print("****")
-    # state.print_board()
-    print("**************************")
+def backtracking_search(firstState):
     queue = []
-    for i in stack:
-        print('board in stack')
-        i.print_board()
-    for row in state.board:
-        for cell in row:
-            if cell.value == '_':
-                queue.append(cell)
-    var = queue.pop(0)
-    print(var.domain)
-    for value in var.domain:
-        print(value)
-        var.value = value
-        if check_constraints(state):
-            saveState = copy.deepcopy(state)
-            stack.append(saveState)
-            recursive_backtracking(state, stack)
-    state = stack.pop(-1)
-    recursive_backtracking(state, stack)
-
-
-def backtracking_search(state: State):
-    stack = []
-    recursive_backtracking(state, stack)
-
-# def backtracking_search(state: State):
-#     queue = []
-#     stack = [state]
-#     newState = copy.deepcopy(state)
-#     while True:
-#         # print('1')
-#         # newState = copy.deepcopy(newState)
-#         if is_assignment_complete(newState):
-#             newState.print_board()
-#             return
-#         for row in newState.board:
-#             for cell in row:
-#                 if cell.value == '_':
-#                     queue.append(cell)
-#         cell = queue.pop(0)
-#         for value in cell.domain:
-#             cell.value = value
-#             # if not check_constraints(newState):
-#             #     newState = stack.pop(-1)
-#             if check_constraints(newState):
-#                 saveState = copy.deepcopy(newState)
-#                 stack.append(saveState)
-#                 print("**************************")
-#                 for i in stack:
-#                     print('board in stack')
-#                     i.print_board()
+    stack = [firstState]
+    goBack = True
+    while True:
+        state = stack.pop(-1)
+        # print("#####")
+        # state.print_board()
+        if is_assignment_complete(state):
+            state.print_board()
+            return
+        queue = []
+        for row in state.board:
+            for cell in row:
+                if cell.value == '_':
+                    queue.append(cell)
+        cell = queue.pop(0)
+        for value in cell.domain:
+            cell.value = value
+            if check_constraints(state):
+                newState = copy.deepcopy(state)
+                stack.append(newState)
+                goBack = False
+                # print("***********")
+                # for i in stack:
+                #     print('board in stack')
+                #     i.print_board()
+            if goBack:
+                state = stack.pop(-1)
 
 
 def is_consistent(state: State):

@@ -8,7 +8,7 @@ from State import *
 def main():
     input_numbers = []  # # first row = size of puzzle(n)  ## second row = number of cells that have color in the
     # statrt  (m)  ## row 3 to row 3+m :
-    input = open("input1.txt").readlines()
+    input = open("input3.txt").readlines()
     for line in input:
         line = line.rstrip()
         numbers = line.split(' ')
