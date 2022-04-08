@@ -124,7 +124,7 @@ def check_constraints(state: State):
 def backtracking_search(firstState):
     queue = []
     stack = [firstState]
-    goBack = True
+    # goBack = True
     while True:
         state = stack.pop(-1)
         # print("#####")
@@ -148,8 +148,8 @@ def backtracking_search(firstState):
                 # for i in stack:
                 #     print('board in stack')
                 #     i.print_board()
-            if goBack:
-                state = stack.pop(-1)
+            # if goBack:
+            #     state = stack.pop(-1)
 
 
 def is_consistent(state: State):
