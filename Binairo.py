@@ -1,3 +1,4 @@
+import copy
 import random
 from copy import deepcopy
 import math
@@ -59,7 +60,7 @@ def check_circles_limit(state: State):  # returns false if number of white or bl
 
 
 def is_unique(state: State):  # checks if all rows are unique && checks if all cols are unique
-    # check rows
+    # check rows1
     for i in range(0, state.size - 1):
         for j in range(i + 1, state.size):
             count = 0
@@ -110,11 +111,9 @@ def FORWARD_CHECKING(state: State):
     pass
 
 
-def check_constraints(state: State, var, value):
-    var.value = value
+def check_constraints(state: State):
     if check_Adjancy_Limit(state) and check_circles_limit(state) and is_unique(state):
         return True
-    return False
 
 
 """
@@ -122,26 +121,62 @@ def check_constraints(state: State, var, value):
 """
 
 
-def recursive_backtracking(state, queue):
-    if is_assignment_complete(state):
-        state.print_board()
-        return
-    var = queue.pop(0)
-    for value in var.domain:
-        if check_constraints(state, var, value):
-            recursive_backtracking(state, queue)
-        # if not check_constraints(state, var, value):
-        #     var.domain.remove(value)
-
-
-def backtracking_search(state: State):
-    stack = []
+def recursive_backtracking(state, stack):
+    # # if is_assignment_complete(state):
+    # print("****")
+    # state.print_board()
+    print("**************************")
     queue = []
+    for i in stack:
+        print('board in stack')
+        i.print_board()
     for row in state.board:
         for cell in row:
             if cell.value == '_':
                 queue.append(cell)
-    recursive_backtracking(state, queue)
+    var = queue.pop(0)
+    print(var.domain)
+    for value in var.domain:
+        print(value)
+        var.value = value
+        if check_constraints(state):
+            saveState = copy.deepcopy(state)
+            stack.append(saveState)
+            recursive_backtracking(state, stack)
+    state = stack.pop(-1)
+    recursive_backtracking(state, stack)
+
+
+def backtracking_search(state: State):
+    stack = []
+    recursive_backtracking(state, stack)
+
+# def backtracking_search(state: State):
+#     queue = []
+#     stack = [state]
+#     newState = copy.deepcopy(state)
+#     while True:
+#         # print('1')
+#         # newState = copy.deepcopy(newState)
+#         if is_assignment_complete(newState):
+#             newState.print_board()
+#             return
+#         for row in newState.board:
+#             for cell in row:
+#                 if cell.value == '_':
+#                     queue.append(cell)
+#         cell = queue.pop(0)
+#         for value in cell.domain:
+#             cell.value = value
+#             # if not check_constraints(newState):
+#             #     newState = stack.pop(-1)
+#             if check_constraints(newState):
+#                 saveState = copy.deepcopy(newState)
+#                 stack.append(saveState)
+#                 print("**************************")
+#                 for i in stack:
+#                     print('board in stack')
+#                     i.print_board()
 
 
 def is_consistent(state: State):
