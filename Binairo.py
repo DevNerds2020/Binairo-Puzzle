@@ -3,6 +3,7 @@ import random
 from copy import deepcopy
 import math
 import State
+import numpy as np
 import Cell
 
 
@@ -99,10 +100,6 @@ def is_assignment_complete(state: State):  # check if all variables are assigned
     return True
 
 
-def MRV_HEURISTIC(state: State):
-    pass
-
-
 def LCV_HEURISTIC(state: State):
     pass
 
@@ -121,14 +118,74 @@ def check_constraints(state: State):
 """
 
 
+def MRV_HEURISTIC(state: State):
+    # print(state.board)
+    for row in state.board:
+        for i in range(len(row)):
+            if i < 2:
+                if i == 0:
+                    if row[i + 1].value != '_' and (row[i + 1].value == row[i + 2].value):
+                        row[i].domain.remove(row[i + 1].value.lower())
+                if i == 1:
+                    if row[i + 1].value != '_' and (
+                            row[i - 1].value == row[i + 1].value or row[i + 1].value == row[i + 2].value):
+                        row[i].domain.remove(row[i + 1].value.lower())
+            elif i > state.size - 3:
+                if i == state.size - 2:
+                    if row[i - 1].value != '_' and \
+                            (row[i - 1].value == row[i + 1].value or row[i - 1].value == row[i - 2].value):
+                        print(row[i - 1].value, row[i - 2].value, row[i + 1].value)
+                        row[i].domain.remove(row[i - 1].value.lower())
+                if i == state.size - 1:
+                    if row[i - 1].value != '_' and (row[i - 1].value == row[i - 2].value):
+                        row[i].domain.remove(row[i - 1].value.lower())
+            else:
+                if row[i + 1].value != '_' and \
+                        (row[i + 1].value == row[i + 2].value or row[i - 1].value == row[i + 1].value):
+                    row[i].domain.remove(row[i + 1].value.lower())
+                    # print(row[i].x, row[i].y)
+                    # print(row[i].domain)
+                    # print(row[i + 1].value)
+                elif row[i - 1].value != '_' and (row[i - 1].value == row[i - 2].value):
+                    row[i].domain.remove(row[i - 1].value.lower())
+    reverseBoard = np.array(state.board).T.tolist()
+    for row in reverseBoard:
+        for i in range(len(row)):
+            if i < 2:
+                if i == 0:
+                    if row[i + 1].value != '_' and (row[i + 1].value == row[i + 2].value):
+                        row[i].domain.remove(row[i + 1].value.lower())
+                if i == 1:
+                    if row[i + 1].value != '_' and (
+                            row[i - 1].value == row[i + 1].value or row[i + 1].value == row[i + 2].value):
+                        print(row[i].x, row[i].y)
+                        print(row[i].domain, row[i+1].value)
+                        row[i].domain.remove(row[i + 1].value.lower())
+            elif i > state.size - 3:
+                if i == state.size - 2:
+                    if row[i - 1].value != '_' and \
+                            (row[i - 1].value == row[i + 1].value or row[i - 1].value == row[i - 2].value):
+                        # print(row[i - 1].value, row[i - 2].value, row[i + 1].value)
+                        row[i].domain.remove(row[i - 1].value.lower())
+                if i == state.size - 1:
+                    if row[i - 1].value != '_' and (row[i - 1].value == row[i - 2].value):
+                        row[i].domain.remove(row[i - 1].value.lower())
+            else:
+                if row[i + 1].value != '_' and \
+                        (row[i + 1].value == row[i + 2].value or row[i - 1].value == row[i + 1].value):
+                    # print(row[i].x, row[i].y)
+                    # print(row[i].domain)
+                    # print(row[i + 1].value)
+                    row[i].domain.remove(row[i + 1].value.lower())
+                elif row[i - 1].value != '_' and (row[i - 1].value == row[i - 2].value):
+                    row[i].domain.remove(row[i - 1].value.lower())
+
+
 def backtracking_search(firstState):
     queue = []
     stack = [firstState]
-    # goBack = True
     while True:
         state = stack.pop(-1)
-        # print("#####")
-        # state.print_board()
         if is_assignment_complete(state):
             state.print_board()
             return
@@ -144,12 +201,6 @@ def backtracking_search(firstState):
                 newState = copy.deepcopy(state)
                 stack.append(newState)
                 goBack = False
-                # print("***********")
-                # for i in stack:
-                #     print('board in stack')
-                #     i.print_board()
-            # if goBack:
-            #     state = stack.pop(-1)
 
 
 def is_consistent(state: State):
