@@ -125,60 +125,40 @@ def MRV_HEURISTIC(state: State):
             if i < 2:
                 if i == 0:
                     if row[i + 1].value != '_' and (row[i + 1].value == row[i + 2].value):
-                        row[i].domain.remove(row[i + 1].value.lower())
+                        row[i].value = row[i+1].value.lower()
+                        row[i].change_color()
                 if i == 1:
                     if row[i + 1].value != '_' and (
                             row[i - 1].value == row[i + 1].value or row[i + 1].value == row[i + 2].value):
-                        row[i].domain.remove(row[i + 1].value.lower())
+                        row[i].value = row[i + 1].value.lower()
+                        row[i].change_color()
             elif i > state.size - 3:
                 if i == state.size - 2:
                     if row[i - 1].value != '_' and \
                             (row[i - 1].value == row[i + 1].value or row[i - 1].value == row[i - 2].value):
                         print(row[i - 1].value, row[i - 2].value, row[i + 1].value)
-                        row[i].domain.remove(row[i - 1].value.lower())
+                        row[i].value = row[i + 1].value.lower()
+                        row[i].change_color()
                 if i == state.size - 1:
                     if row[i - 1].value != '_' and (row[i - 1].value == row[i - 2].value):
-                        row[i].domain.remove(row[i - 1].value.lower())
+                        row[i].value = row[i + 1].value.lower()
+                        row[i].change_color()
             else:
                 if row[i + 1].value != '_' and \
                         (row[i + 1].value == row[i + 2].value or row[i - 1].value == row[i + 1].value):
-                    row[i].domain.remove(row[i + 1].value.lower())
+                    row[i].value = row[i + 1].value.lower()
+                    row[i].change_color()
                     # print(row[i].x, row[i].y)
                     # print(row[i].domain)
                     # print(row[i + 1].value)
                 elif row[i - 1].value != '_' and (row[i - 1].value == row[i - 2].value):
-                    row[i].domain.remove(row[i - 1].value.lower())
-    reverseBoard = np.array(state.board).T.tolist()
-    for row in reverseBoard:
-        for i in range(len(row)):
-            if i < 2:
-                if i == 0:
-                    if row[i + 1].value != '_' and (row[i + 1].value == row[i + 2].value):
-                        row[i].domain.remove(row[i + 1].value.lower())
-                if i == 1:
-                    if row[i + 1].value != '_' and (
-                            row[i - 1].value == row[i + 1].value or row[i + 1].value == row[i + 2].value):
-                        print(row[i].x, row[i].y)
-                        print(row[i].domain, row[i+1].value)
-                        row[i].domain.remove(row[i + 1].value.lower())
-            elif i > state.size - 3:
-                if i == state.size - 2:
-                    if row[i - 1].value != '_' and \
-                            (row[i - 1].value == row[i + 1].value or row[i - 1].value == row[i - 2].value):
-                        # print(row[i - 1].value, row[i - 2].value, row[i + 1].value)
-                        row[i].domain.remove(row[i - 1].value.lower())
-                if i == state.size - 1:
-                    if row[i - 1].value != '_' and (row[i - 1].value == row[i - 2].value):
-                        row[i].domain.remove(row[i - 1].value.lower())
-            else:
-                if row[i + 1].value != '_' and \
-                        (row[i + 1].value == row[i + 2].value or row[i - 1].value == row[i + 1].value):
-                    # print(row[i].x, row[i].y)
-                    # print(row[i].domain)
-                    # print(row[i + 1].value)
-                    row[i].domain.remove(row[i + 1].value.lower())
-                elif row[i - 1].value != '_' and (row[i - 1].value == row[i - 2].value):
-                    row[i].domain.remove(row[i - 1].value.lower())
+                    row[i].value = row[i + 1].value.lower()
+                    row[i].change_color()
+    board = state.board
+    # reverseBoard = np.array(state.board).T.tolist()
+    # state.board = reverseBoard
+    # print("reverse board")
+    # state.print_board()
 
 
 def backtracking_search(firstState):
