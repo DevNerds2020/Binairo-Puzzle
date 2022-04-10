@@ -105,7 +105,12 @@ def LCV_HEURISTIC(state: State):
 
 
 def FORWARD_CHECKING(state: State):
-    pass
+    """agar be jaei residim ke hich value ro
+    nemishe gharar dad oon state ro be dead end ha
+    ezafe mikonim va az ham aval be stack ezafash nemikonim"""
+    for row in state.board:
+        for cell in row:
+            pass
 
 
 def check_constraints(state: State):
@@ -119,46 +124,80 @@ def check_constraints(state: State):
 
 
 def MRV_HEURISTIC(state: State):
-    # print(state.board)
     for row in state.board:
         for i in range(len(row)):
             if i < 2:
                 if i == 0:
-                    if row[i + 1].value != '_' and (row[i + 1].value == row[i + 2].value):
-                        row[i].value = row[i+1].value.lower()
+                    if row[i + 1].value != '_' and (row[i + 1].value.lower() == row[i + 2].value.lower()):
+                        row[i].value = row[i + 1].value.lower()
                         row[i].change_color()
                 if i == 1:
                     if row[i + 1].value != '_' and (
-                            row[i - 1].value == row[i + 1].value or row[i + 1].value == row[i + 2].value):
+                            row[i - 1].value.lower() == row[i + 1].value.lower() or row[i + 1].value.lower() == row[
+                        i + 2].value.lower()):
                         row[i].value = row[i + 1].value.lower()
                         row[i].change_color()
             elif i > state.size - 3:
                 if i == state.size - 2:
                     if row[i - 1].value != '_' and \
-                            (row[i - 1].value == row[i + 1].value or row[i - 1].value == row[i - 2].value):
-                        print(row[i - 1].value, row[i - 2].value, row[i + 1].value)
-                        row[i].value = row[i + 1].value.lower()
+                            (row[i - 1].value.lower() == row[i + 1].value.lower() or row[i - 1].value.lower() == row[
+                                i - 2].value.lower()):
+                        # print(row[i - 1].value, row[i - 2].value, row[i + 1].value)
+                        row[i].value = row[i - 1].value.lower()
                         row[i].change_color()
                 if i == state.size - 1:
-                    if row[i - 1].value != '_' and (row[i - 1].value == row[i - 2].value):
-                        row[i].value = row[i + 1].value.lower()
+                    if row[i - 1].value.lower() != '_' and (row[i - 1].value.lower() == row[i - 2].value.lower()):
+                        row[i].value = row[i - 1].value.lower()
                         row[i].change_color()
             else:
                 if row[i + 1].value != '_' and \
-                        (row[i + 1].value == row[i + 2].value or row[i - 1].value == row[i + 1].value):
+                        (row[i + 1].value.lower() == row[i + 2].value.lower() or row[i - 1].value.lower() == row[
+                            i + 1].value.lower()):
                     row[i].value = row[i + 1].value.lower()
                     row[i].change_color()
-                    # print(row[i].x, row[i].y)
-                    # print(row[i].domain)
-                    # print(row[i + 1].value)
-                elif row[i - 1].value != '_' and (row[i - 1].value == row[i - 2].value):
-                    row[i].value = row[i + 1].value.lower()
+                elif row[i - 1].value != '_' and (row[i - 1].value.lower() == row[i - 2].value.lower()):
+                    row[i].value = row[i - 1].value.lower()
                     row[i].change_color()
     board = state.board
-    # reverseBoard = np.array(state.board).T.tolist()
-    # state.board = reverseBoard
+    reverseBoard = np.array(state.board).T.tolist()
+    state.board = reverseBoard
     # print("reverse board")
     # state.print_board()
+    for row in state.board:
+        for i in range(len(row)):
+            if i < 2:
+                if i == 0:
+                    if row[i + 1].value != '_' and (row[i + 1].value.lower() == row[i + 2].value.lower()):
+                        row[i].value = row[i + 1].value.lower()
+                        row[i].change_color()
+                if i == 1:
+                    if row[i + 1].value != '_' and (
+                            row[i - 1].value.lower() == row[i + 1].value.lower() or row[i + 1].value.lower() == row[
+                        i + 2].value.lower()):
+                        row[i].value = row[i + 1].value.lower()
+                        row[i].change_color()
+            elif i > state.size - 3:
+                if i == state.size - 2:
+                    if row[i - 1].value != '_' and \
+                            (row[i - 1].value.lower() == row[i + 1].value.lower() or row[i - 1].value.lower() == row[
+                                i - 2].value.lower()):
+                        # print(row[i - 1].value, row[i - 2].value, row[i + 1].value)
+                        row[i].value = row[i - 1].value.lower()
+                        row[i].change_color()
+                if i == state.size - 1:
+                    if row[i - 1].value != '_' and (row[i - 1].value.lower() == row[i - 2].value.lower()):
+                        row[i].value = row[i - 1].value.lower()
+                        row[i].change_color()
+            else:
+                if row[i + 1].value != '_' and \
+                        (row[i + 1].value.lower() == row[i + 2].value.lower() or row[i - 1].value.lower() == row[
+                            i + 1].value.lower()):
+                    row[i].value = row[i + 1].value.lower()
+                    row[i].change_color()
+                elif row[i - 1].value != '_' and (row[i - 1].value.lower() == row[i - 2].value.lower()):
+                    row[i].value = row[i - 1].value.lower()
+                    row[i].change_color()
+    state.board = board
 
 
 def backtracking_search(firstState):
@@ -166,6 +205,7 @@ def backtracking_search(firstState):
     stack = [firstState]
     while True:
         state = stack.pop(-1)
+        # state.print_board()
         if is_assignment_complete(state):
             state.print_board()
             return

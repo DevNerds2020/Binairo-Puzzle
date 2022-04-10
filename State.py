@@ -2,9 +2,10 @@ from Cell import *
 
 
 class State:
-    def __init__(self, size, board=[]):
+    def __init__(self, size, board=[], deadEnds=[]):
         self.board = board
         self.size = size
+        self.deadEnds = deadEnds
 
     def print_domain(self):
         for i in range(0, self.size):

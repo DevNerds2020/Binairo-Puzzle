@@ -8,7 +8,7 @@ from State import *
 def main():
     input_numbers = []  # # first row = size of puzzle(n)  ## second row = number of cells that have color in the
     # statrt  (m)  ## row 3 to row 3+m :
-    input = open("input1.txt").readlines()
+    input = open("input2.txt").readlines()
     for line in input:
         line = line.rstrip()
         numbers = line.split(' ')
@@ -41,7 +41,12 @@ def main():
     start_time = time()
     # backTrack(state)   implement backTrack and other csp functions in Binairo.py
     MRV_HEURISTIC(state)
+    print("board after mrv")
+    state.print_board()
+    print("board after second mrv heuristic")
+    state.print_board()
     backtracking_search(state)
+    # backtracking_search(state)
     end_time = time()
     print('time: ', end_time - start_time)
 
