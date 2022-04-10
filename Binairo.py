@@ -125,79 +125,23 @@ def check_constraints(state: State):
 
 def MRV_HEURISTIC(state: State):
     for row in state.board:
-        for i in range(len(row)):
-            if i < 2:
-                if i == 0:
-                    if row[i + 1].value != '_' and (row[i + 1].value.lower() == row[i + 2].value.lower()):
-                        row[i].value = row[i + 1].value.lower()
-                        row[i].change_color()
-                if i == 1:
-                    if row[i + 1].value != '_' and (
-                            row[i - 1].value.lower() == row[i + 1].value.lower() or row[i + 1].value.lower() == row[
-                        i + 2].value.lower()):
-                        row[i].value = row[i + 1].value.lower()
-                        row[i].change_color()
-            elif i > state.size - 3:
-                if i == state.size - 2:
-                    if row[i - 1].value != '_' and \
-                            (row[i - 1].value.lower() == row[i + 1].value.lower() or row[i - 1].value.lower() == row[
-                                i - 2].value.lower()):
-                        # print(row[i - 1].value, row[i - 2].value, row[i + 1].value)
-                        row[i].value = row[i - 1].value.lower()
-                        row[i].change_color()
-                if i == state.size - 1:
-                    if row[i - 1].value.lower() != '_' and (row[i - 1].value.lower() == row[i - 2].value.lower()):
-                        row[i].value = row[i - 1].value.lower()
-                        row[i].change_color()
-            else:
-                if row[i + 1].value != '_' and \
-                        (row[i + 1].value.lower() == row[i + 2].value.lower() or row[i - 1].value.lower() == row[
-                            i + 1].value.lower()):
-                    row[i].value = row[i + 1].value.lower()
-                    row[i].change_color()
-                elif row[i - 1].value != '_' and (row[i - 1].value.lower() == row[i - 2].value.lower()):
-                    row[i].value = row[i - 1].value.lower()
-                    row[i].change_color()
-    board = state.board
-    reverseBoard = np.array(state.board).T.tolist()
-    state.board = reverseBoard
-    # print("reverse board")
-    # state.print_board()
-    for row in state.board:
-        for i in range(len(row)):
-            if i < 2:
-                if i == 0:
-                    if row[i + 1].value != '_' and (row[i + 1].value.lower() == row[i + 2].value.lower()):
-                        row[i].value = row[i + 1].value.lower()
-                        row[i].change_color()
-                if i == 1:
-                    if row[i + 1].value != '_' and (
-                            row[i - 1].value.lower() == row[i + 1].value.lower() or row[i + 1].value.lower() == row[
-                        i + 2].value.lower()):
-                        row[i].value = row[i + 1].value.lower()
-                        row[i].change_color()
-            elif i > state.size - 3:
-                if i == state.size - 2:
-                    if row[i - 1].value != '_' and \
-                            (row[i - 1].value.lower() == row[i + 1].value.lower() or row[i - 1].value.lower() == row[
-                                i - 2].value.lower()):
-                        # print(row[i - 1].value, row[i - 2].value, row[i + 1].value)
-                        row[i].value = row[i - 1].value.lower()
-                        row[i].change_color()
-                if i == state.size - 1:
-                    if row[i - 1].value != '_' and (row[i - 1].value.lower() == row[i - 2].value.lower()):
-                        row[i].value = row[i - 1].value.lower()
-                        row[i].change_color()
-            else:
-                if row[i + 1].value != '_' and \
-                        (row[i + 1].value.lower() == row[i + 2].value.lower() or row[i - 1].value.lower() == row[
-                            i + 1].value.lower()):
-                    row[i].value = row[i + 1].value.lower()
-                    row[i].change_color()
-                elif row[i - 1].value != '_' and (row[i - 1].value.lower() == row[i - 2].value.lower()):
-                    row[i].value = row[i - 1].value.lower()
-                    row[i].change_color()
-    state.board = board
+        for cell in row:
+            if cell.value == '_':
+                firstBool = False
+                secondBool = False
+                cell.value = 'w'
+                if check_constraints(state):
+                    firstBool = True
+                cell.value = 'b'
+                if check_constraints(state):
+                    secondBool = True
+                if firstBool != secondBool:
+                    if firstBool:
+                        cell.value = 'w'
+                    if secondBool:
+                        cell.value = 'b'
+                else:
+                    cell.value = '_'
 
 
 def backtracking_search(firstState):
