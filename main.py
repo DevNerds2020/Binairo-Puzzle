@@ -43,6 +43,8 @@ def main():
     MRV_HEURISTIC(state)
     print("board after mrv")
     state.print_board()
+    print("******")
+    # MRV_HEURISTIC(state)
     # print("board after second mrv heuristic")
     # state.print_board()
     backtracking_search(state)

@@ -5,6 +5,7 @@ import math
 import State
 import numpy as np
 import Cell
+from numba import njit
 
 
 def check_Adjancy_Limit(state: State):
@@ -100,10 +101,6 @@ def is_assignment_complete(state: State):  # check if all variables are assigned
     return True
 
 
-def LCV_HEURISTIC(state: State):
-    pass
-
-
 def FORWARD_CHECKING(state: State):
     """agar be jaei residim ke hich value ro
     nemishe gharar dad oon state ro be dead end ha
@@ -123,25 +120,75 @@ def check_constraints(state: State):
 """
 
 
+def LCV_HEURISTIC(state: State, cell, queue, stack):
+    # print("**********")
+    # state.print_board()
+    cell.value = 'w'
+    countForWhite = 0
+    whiteBool = False
+    if check_constraints(state):
+        whiteBool = True
+        if len(queue) > 0:
+            nextCell = queue[0]
+            for value in nextCell.domain:
+                nextCell.value = value
+                if check_constraints(state):
+                    countForWhite += 1
+            nextCell.value = '_'
+    cell.value = 'b'
+    countForBlack = 0
+    blackBool = False
+    if check_constraints(state):
+        blackBool = True
+        if len(queue) > 0:
+            nextCell = queue[0]
+            for value in nextCell.domain:
+                nextCell.value = value
+                if check_constraints(state):
+                    countForBlack += 1
+            nextCell.value = '_'
+
+    if countForWhite >= countForBlack:
+        if blackBool:
+            cell.value = 'b'
+            newState = copy.deepcopy(state)
+            stack.append(newState)
+        if whiteBool:
+            cell.value = 'w'
+            newState = copy.deepcopy(state)
+            stack.append(newState)
+    else:
+        if whiteBool:
+            cell.value = 'w'
+            newState = copy.deepcopy(state)
+            stack.append(newState)
+        if blackBool:
+            cell.value = 'b'
+            newState = copy.deepcopy(state)
+            stack.append(newState)
+    return stack
+
+
 def MRV_HEURISTIC(state: State):
-    for row in state.board:
-        for cell in row:
-            if cell.value == '_':
-                firstBool = False
-                secondBool = False
-                cell.value = 'w'
-                if check_constraints(state):
-                    firstBool = True
-                cell.value = 'b'
-                if check_constraints(state):
-                    secondBool = True
-                if firstBool != secondBool:
-                    if firstBool:
-                        cell.value = 'w'
-                    if secondBool:
-                        cell.value = 'b'
-                else:
-                    cell.value = '_'
+    for i in range(5):
+        for row in state.board:
+            for cell in row:
+                if cell.value == '_':
+                    firstBool = False
+                    secondBool = False
+                    cell.value = 'w'
+                    if check_constraints(state):
+                        firstBool = True
+                    cell.value = 'b'
+                    if check_constraints(state):
+                        secondBool = True
+                    if firstBool != secondBool:
+                        if firstBool:
+                            cell.value = 'w'
+                        if secondBool:
+                            cell.value = 'b'
+                    else:
+                        cell.value = '_'
 
 
 def backtracking_search(firstState):
@@ -159,12 +206,12 @@ def backtracking_search(firstState):
                 if cell.value == '_':
                     queue.append(cell)
         cell = queue.pop(0)
-        for value in cell.domain:
-            cell.value = value
-            if check_constraints(state):
-                newState = copy.deepcopy(state)
-                stack.append(newState)
-                goBack = False
+        stack = LCV_HEURISTIC(state, cell, queue, stack)
+        # for value in cell.domain:
+        #     cell.value = value
+        #     if check_constraints(state):
+        #         newState = copy.deepcopy(state)
+        #         stack.append(newState)
 
 
 def is_consistent(state: State):
