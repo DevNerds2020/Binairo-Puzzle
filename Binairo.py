@@ -6,6 +6,7 @@ import State
 import numpy as np
 import Cell
 from numba import njit
+from time import time
 
 
 def check_Adjancy_Limit(state: State):
@@ -102,12 +103,20 @@ def is_assignment_complete(state: State):  # check if all variables are assigned
 
 
 def FORWARD_CHECKING(state: State):
-    """agar be jaei residim ke hich value ro
-    nemishe gharar dad oon state ro be dead end ha
-    ezafe mikonim va az ham aval be stack ezafash nemikonim"""
     for row in state.board:
         for cell in row:
-            pass
+            if cell.value == "_":
+                countDomain = 0
+                for value in cell.domain:
+                    cell.value = value
+                    if not check_constraints(state):
+                        countDomain += 1
+                        cell.domain.remove(value)
+                    if countDomain == 2:
+                        print("***************", cell.x, cell.y)
+                        return False
+                cell.value = '_'
+    return True
 
 
 def check_constraints(state: State):
@@ -120,53 +129,21 @@ def check_constraints(state: State):
 """
 
 
-def LCV_HEURISTIC(state: State, cell, queue, stack):
-    # print("**********")
-    # state.print_board()
-    cell.value = 'w'
-    countForWhite = 0
-    whiteBool = False
-    if check_constraints(state):
-        whiteBool = True
-        if len(queue) > 0:
-            nextCell = queue[0]
-            for value in nextCell.domain:
-                nextCell.value = value
-                if check_constraints(state):
-                    countForWhite += 1
-            nextCell.value = '_'
-    cell.value = 'b'
-    countForBlack = 0
-    blackBool = False
-    if check_constraints(state):
-        blackBool = True
-        if len(queue) > 0:
-            nextCell = queue[0]
-            for value in nextCell.domain:
-                nextCell.value = value
-                if check_constraints(state):
-                    countForBlack += 1
-            nextCell.value = '_'
+def AC3(state):
+    pass
 
-    if countForWhite >= countForBlack:
-        if blackBool:
-            cell.value = 'b'
-            newState = copy.deepcopy(state)
-            stack.append(newState)
-        if whiteBool:
-            cell.value = 'w'
-            newState = copy.deepcopy(state)
-            stack.append(newState)
-    else:
-        if whiteBool:
-            cell.value = 'w'
-            newState = copy.deepcopy(state)
-            stack.append(newState)
-        if blackBool:
-            cell.value = 'b'
-            newState = copy.deepcopy(state)
-            stack.append(newState)
-    return stack
+
+def LCV_HEURISTIC(state1, state2, queue):
+    nextCell = queue[0]
+    state1count = 0
+    state2count = 0
+    for value in nextCell.domain:
+        nextCell.value = value
+        if check_constraints(state1):
+            state1count += 1
+        if check_constraints(state2):
+            state2count += 1
+    return state1count, state2count
 
 
 def MRV_HEURISTIC(state: State):
@@ -197,6 +174,10 @@ def backtracking_search(firstState):
     while True:
         state = stack.pop(-1)
         # state.print_board()
+        FORWARD_CHECKING(state)
+        # if not FORWARD_CHECKING(state):
+        #     state = stack.pop(-1)
+        # state.print_board()
         if is_assignment_complete(state):
             state.print_board()
             return
@@ -206,12 +187,21 @@ def backtracking_search(firstState):
                 if cell.value == '_':
                     queue.append(cell)
         cell = queue.pop(0)
-        stack = LCV_HEURISTIC(state, cell, queue, stack)
-        # for value in cell.domain:
-        #     cell.value = value
-        #     if check_constraints(state):
-        #         newState = copy.deepcopy(state)
-        #         stack.append(newState)
+        # stack = LCV_HEURISTIC(state, cell, queue, stack)
+        count = 0
+        for value in cell.domain:
+            cell.value = value
+            if check_constraints(state):
+                newState = copy.deepcopy(state)
+                stack.append(newState)
+                count += 1
+        if count == 2:
+            s1, s2 = LCV_HEURISTIC(stack[-1], stack[-2], queue)
+            if s2 > s1:
+                state1 = stack[-1]
+                state2 = stack[-2]
+                stack[-1] = state2
+                stack[-2] = state1
 
 
 def is_consistent(state: State):
