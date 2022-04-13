@@ -102,23 +102,6 @@ def is_assignment_complete(state: State):  # check if all variables are assigned
     return True
 
 
-def FORWARD_CHECKING(state: State):
-    for row in state.board:
-        for cell in row:
-            if cell.value == "_":
-                countDomain = 0
-                for value in cell.domain:
-                    cell.value = value
-                    if not check_constraints(state):
-                        countDomain += 1
-                        cell.domain.remove(value)
-                    if countDomain == 2:
-                        print("***************", cell.x, cell.y)
-                        return False
-                cell.value = '_'
-    return True
-
-
 def check_constraints(state: State):
     if check_Adjancy_Limit(state) and check_circles_limit(state) and is_unique(state):
         return True
@@ -127,6 +110,21 @@ def check_constraints(state: State):
 """
 
 """
+
+
+def FORWARD_CHECKING(state: State):
+    for row in state.board:
+        for cell in row:
+            if cell.value == "_":
+                for value in cell.domain:
+                    cell.value = value
+                    if not check_constraints(state):
+                        cell.domain.remove(value)
+                    if len(cell.domain) == 0:
+                        print("***************", cell.x, cell.y)
+                        return False
+                cell.value = '_'
+    return True
 
 
 def AC3(state):
