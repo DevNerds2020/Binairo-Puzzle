@@ -105,6 +105,7 @@ def is_assignment_complete(state: State):  # check if all variables are assigned
 def check_constraints(state: State):
     if check_Adjancy_Limit(state) and check_circles_limit(state) and is_unique(state):
         return True
+    return False
 
 
 """
@@ -115,16 +116,22 @@ def check_constraints(state: State):
 def FORWARD_CHECKING(state: State):
     for row in state.board:
         for cell in row:
+            cell.domain = ['w', 'b']
             if cell.value == "_":
+                # print("######")
+                # print(cell.domain)
                 for value in cell.domain:
                     cell.value = value
+                    # print("#state that we are checking")
+                    # state.print_board()
                     if not check_constraints(state):
+                        # print("with this value this state cant be right => ", cell.value)
                         cell.domain.remove(value)
                     if len(cell.domain) == 0:
-                        print("***************", cell.x, cell.y)
                         return False
-                cell.value = '_'
+                    cell.value = '_'
     return True
+    # print("#######")
 
 
 def AC3(state):
@@ -172,7 +179,10 @@ def backtracking_search(firstState):
     while True:
         state = stack.pop(-1)
         # state.print_board()
-        FORWARD_CHECKING(state)
+        # print("before forward checking")
+        # state.print_board()
+        if not FORWARD_CHECKING(state):
+            state = stack.pop(-1)
         # if not FORWARD_CHECKING(state):
         #     state = stack.pop(-1)
         # state.print_board()
@@ -185,6 +195,8 @@ def backtracking_search(firstState):
                 if cell.value == '_':
                     queue.append(cell)
         cell = queue.pop(0)
+        # print("current cell that we are giving color to")
+        # print(cell.x, cell.y, cell.domain)
         # stack = LCV_HEURISTIC(state, cell, queue, stack)
         count = 0
         for value in cell.domain:
