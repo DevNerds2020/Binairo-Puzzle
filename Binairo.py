@@ -113,25 +113,18 @@ def check_constraints(state: State):
 """
 
 
-def FORWARD_CHECKING(state: State):
-    for row in state.board:
-        for cell in row:
-            cell.domain = ['w', 'b']
-            if cell.value == "_":
-                # print("######")
-                # print(cell.domain)
-                for value in cell.domain:
-                    cell.value = value
-                    # print("#state that we are checking")
-                    # state.print_board()
+def FORWARD_CHECKING(state: State, cell):
+    for i in range(cell.x, state.size):
+        for j in range(cell.y, state.size):
+            if state.board[i][j] == "_":
+                for value in state.board[i][j].domain:
+                    state.board[i][j].value = value
                     if not check_constraints(state):
-                        # print("with this value this state cant be right => ", cell.value)
-                        cell.domain.remove(value)
-                    if len(cell.domain) == 0:
+                        state.board[i][j].domain.remove(value)
+                    if len(state.board[i][j].domain) == 0:
                         return False
-                    cell.value = '_'
+                    state.board[i][j].value = "_"
     return True
-    # print("#######")
 
 
 def AC3(state):
@@ -181,8 +174,6 @@ def backtracking_search(firstState):
         # state.print_board()
         # print("before forward checking")
         # state.print_board()
-        if not FORWARD_CHECKING(state):
-            state = stack.pop(-1)
         # if not FORWARD_CHECKING(state):
         #     state = stack.pop(-1)
         # state.print_board()
@@ -195,6 +186,8 @@ def backtracking_search(firstState):
                 if cell.value == '_':
                     queue.append(cell)
         cell = queue.pop(0)
+        if not FORWARD_CHECKING(state, cell):
+            state = stack.pop(-1)
         # print("current cell that we are giving color to")
         # print(cell.x, cell.y, cell.domain)
         # stack = LCV_HEURISTIC(state, cell, queue, stack)
