@@ -125,6 +125,24 @@ def FORWARD_CHECKING(state: State, cell):
                         return False
                     state.board[i][j].value = "_"
     return True
+    # for row in state.board:
+    #     for cell in row:
+    #         cell.domain = ['w', 'b']
+    #         if cell.value == "_":
+    #             # print("######")
+    #             # print(cell.domain)
+    #             for value in cell.domain:
+    #                 cell.value = value
+    #                 # print("#state that we are checking")
+    #                 # state.print_board()
+    #                 if not check_constraints(state):
+    #                     # print("with this value this state cant be right => ", cell.value)
+    #                     cell.domain.remove(value)
+    #                 if len(cell.domain) == 0:
+    #                     return False
+    #                 cell.value = '_'
+    # return True
+    # # print("#######")
 
 
 def AC3(state):
@@ -132,16 +150,31 @@ def AC3(state):
 
 
 def LCV_HEURISTIC(state1, state2, queue):
+    # print("state1")
+    # state1.print_board()
+    # print("state2")
+    # state2.print_board()
+    # print("nextCell")
+    # print(queue[0].x, queue[0].y)
     nextCell = queue[0]
-    state1count = 0
-    state2count = 0
+    s1 = 0
+    s2 = 0
+    # print(state1.board[nextCell.x][nextCell.y])
+    # print(state2.board[nextCell.x][nextCell.y])
+    # state1.board[nextCell.x][nextCell.y]
+    # state2.board[nextCell.x][nextCell.y]
     for value in nextCell.domain:
-        nextCell.value = value
+        state1.board[nextCell.x][nextCell.y].value = value
+        state2.board[nextCell.x][nextCell.y].value = value
+        # state1.print_board()
+        # state2.print_board()
         if check_constraints(state1):
-            state1count += 1
+            s1 += 1
         if check_constraints(state2):
-            state2count += 1
-    return state1count, state2count
+            s2 += 1
+    state1.board[nextCell.x][nextCell.y].value = "_"
+    state2.board[nextCell.x][nextCell.y].value = "_"
+    return s1, s2
 
 
 def MRV_HEURISTIC(state: State):
@@ -187,7 +220,7 @@ def backtracking_search(firstState):
                     queue.append(cell)
         cell = queue.pop(0)
         if not FORWARD_CHECKING(state, cell):
-            state = stack.pop(-1)
+            continue
         # print("current cell that we are giving color to")
         # print(cell.x, cell.y, cell.domain)
         # stack = LCV_HEURISTIC(state, cell, queue, stack)
@@ -200,7 +233,9 @@ def backtracking_search(firstState):
                 count += 1
         if count == 2:
             s1, s2 = LCV_HEURISTIC(stack[-1], stack[-2], queue)
+            # print(s2, s1)
             if s2 > s1:
+                # print("swap")
                 state1 = stack[-1]
                 state2 = stack[-2]
                 stack[-1] = state2
