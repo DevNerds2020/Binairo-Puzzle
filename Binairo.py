@@ -123,51 +123,46 @@ def FORWARD_CHECKING(state: State, cell):
                         state.board[i][j].domain.remove(value)
                     if len(state.board[i][j].domain) == 0:
                         return False
-                    state.board[i][j].value = "_"
+                    elif len(state.board[i][j].domain) == 1:
+                        state.board[i][j].value = state.board[i][j].domain[0]
+                    else:
+                        state.board[i][j].value = "_"
     return True
-    # for row in state.board:
-    #     for cell in row:
-    #         cell.domain = ['w', 'b']
-    #         if cell.value == "_":
-    #             # print("######")
-    #             # print(cell.domain)
-    #             for value in cell.domain:
-    #                 cell.value = value
-    #                 # print("#state that we are checking")
-    #                 # state.print_board()
-    #                 if not check_constraints(state):
-    #                     # print("with this value this state cant be right => ", cell.value)
-    #                     cell.domain.remove(value)
-    #                 if len(cell.domain) == 0:
-    #                     return False
-    #                 cell.value = '_'
-    # return True
-    # # print("#######")
 
 
-def AC3(state):
-    pass
+def AC3(state, cell):
+    queue = []
+    for i in range(cell.x, state.size):
+        for j in range(cell.y, state.size):
+            if state.board[i][j].value == "_":
+                queue.append(state.board[i][j])
+    while len(queue) > 0:
+        cellCheck = queue.pop(0)
+        for value in cellCheck.domain:
+            cellCheck.value = value
+            for c in queue:
+                count = 0
+                for v in c.domain:
+                    c.value = v
+                    if not check_constraints(state):
+                        count += 1
+                    if count == 2:
+                        cellCheck.domain.remove(value)
+                        print(cellCheck.domain)
+                c.value = '_'
+                if len(cellCheck.domain) == 0:
+                    return False
+        cellCheck.value = '_'
+    return True
 
 
 def LCV_HEURISTIC(state1, state2, queue):
-    # print("state1")
-    # state1.print_board()
-    # print("state2")
-    # state2.print_board()
-    # print("nextCell")
-    # print(queue[0].x, queue[0].y)
     nextCell = queue[0]
     s1 = 0
     s2 = 0
-    # print(state1.board[nextCell.x][nextCell.y])
-    # print(state2.board[nextCell.x][nextCell.y])
-    # state1.board[nextCell.x][nextCell.y]
-    # state2.board[nextCell.x][nextCell.y]
     for value in nextCell.domain:
         state1.board[nextCell.x][nextCell.y].value = value
         state2.board[nextCell.x][nextCell.y].value = value
-        # state1.print_board()
-        # state2.print_board()
         if check_constraints(state1):
             s1 += 1
         if check_constraints(state2):
@@ -204,12 +199,8 @@ def backtracking_search(firstState):
     stack = [firstState]
     while True:
         state = stack.pop(-1)
-        # state.print_board()
-        # print("before forward checking")
-        # state.print_board()
-        # if not FORWARD_CHECKING(state):
-        #     state = stack.pop(-1)
-        # state.print_board()
+        print("*******")
+        state.print_board()
         if is_assignment_complete(state):
             state.print_board()
             return
@@ -218,12 +209,13 @@ def backtracking_search(firstState):
             for cell in row:
                 if cell.value == '_':
                     queue.append(cell)
+            if len(queue) == 2:
+                break
         cell = queue.pop(0)
         if not FORWARD_CHECKING(state, cell):
             continue
-        # print("current cell that we are giving color to")
-        # print(cell.x, cell.y, cell.domain)
-        # stack = LCV_HEURISTIC(state, cell, queue, stack)
+        if not AC3(state, cell):
+            continue
         count = 0
         for value in cell.domain:
             cell.value = value
@@ -235,7 +227,6 @@ def backtracking_search(firstState):
             s1, s2 = LCV_HEURISTIC(stack[-1], stack[-2], queue)
             # print(s2, s1)
             if s2 > s1:
-                # print("swap")
                 state1 = stack[-1]
                 state2 = stack[-2]
                 stack[-1] = state2
