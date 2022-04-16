@@ -114,29 +114,31 @@ def check_constraints(state: State):
 
 
 def FORWARD_CHECKING(state, cell):
-    copyState = copy.deepcopy(state)
     queue = []
-    for c in copyState.board[cell.x]:
+    for c in state.board[cell.x]:
         if c.value == '_':
             queue.append(c)
-    col = np.array(copyState.board).transpose()
+    col = np.array(state.board).transpose()
     for c in col[cell.y]:
         if c.value == '_':
             queue.append(c)
-    for c in queue:
-        # c.domain = ['w', 'b']
+    while len(queue) > 0:
+        c = queue.pop(0)
+        count = 0
+        blockedValues = []
         for value in c.domain:
             c.value = value
-            if not check_constraints(copyState):
-                c.domain.remove(value)
-            c.value = "_"
-        if len(c.domain) == 2:
-            c.value = "_"
-        elif len(c.domain) == 1:
-            c.value = c.domain[0]
-        elif len(c.domain) == 0:
+            if not check_constraints(state):
+                blockedValues.append(value)
+                count += 1
+        c.value = '_'
+        if count == 1:
+            if blockedValues[0] == 'b':
+                c.value = 'w'
+            if blockedValues[0] == 'w':
+                c.value = 'b'
+        if count == 2:
             return False
-    state = copy.deepcopy(copyState)
     return True
 
 
@@ -213,9 +215,6 @@ def backtracking_search(firstState):
     stack = [firstState]
     while True:
         state = stack.pop(-1)
-        # print("*****")
-        # state.print_board()
-        # print("*****")
         if is_assignment_complete(state):
             state.print_board()
             return
@@ -228,19 +227,13 @@ def backtracking_search(firstState):
                 break
         cell = queue.pop(0)
         count = 0
-        # print("@@@@@@@@@@@@@@@@@@@@@@@@")
-        # print("cell that we are giving value to", cell.x, cell.y)
-        # state.print_board()
         for value in cell.domain:
             cell.value = value
             if check_constraints(state):
-                if FORWARD_CHECKING(state, cell):
-                    # print("okkk good for value => ", value)
-                    newState = copy.deepcopy(state)
-                    stack.append(newState)
+                newState = copy.deepcopy(state)
+                if FORWARD_CHECKING(newState, newState.board[cell.x][cell.y]):
                     count += 1
-            # else:
-            #     print("ok bad for value => ", value)
+                    stack.append(newState)
         if count == 2:
             s1, s2 = LCV_HEURISTIC(stack[-1], stack[-2], queue)
             if s2 > s1:
