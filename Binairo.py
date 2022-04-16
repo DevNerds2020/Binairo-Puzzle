@@ -113,29 +113,43 @@ def check_constraints(state: State):
 """
 
 
-def FORWARD_CHECKING(state: State, cell):
-    for i in range(cell.x, state.size):
-        for j in range(cell.y, state.size):
-            if state.board[i][j] == "_":
-                for value in state.board[i][j].domain:
-                    state.board[i][j].value = value
-                    if not check_constraints(state):
-                        state.board[i][j].domain.remove(value)
-                    if len(state.board[i][j].domain) == 0:
-                        return False
-                    elif len(state.board[i][j].domain) == 1:
-                        state.board[i][j].value = state.board[i][j].domain[0]
-                    else:
-                        state.board[i][j].value = "_"
+def FORWARD_CHECKING(state, cell):
+    copyState = copy.deepcopy(state)
+    queue = []
+    for c in copyState.board[cell.x]:
+        if c.value == '_':
+            queue.append(c)
+    col = np.array(copyState.board).transpose()
+    for c in col[cell.y]:
+        if c.value == '_':
+            queue.append(c)
+    for c in queue:
+        # c.domain = ['w', 'b']
+        for value in c.domain:
+            c.value = value
+            if not check_constraints(copyState):
+                c.domain.remove(value)
+            c.value = "_"
+        if len(c.domain) == 2:
+            c.value = "_"
+        elif len(c.domain) == 1:
+            c.value = c.domain[0]
+        elif len(c.domain) == 0:
+            return False
+    state = copy.deepcopy(copyState)
     return True
 
 
 def AC3(state, cell):
     queue = []
-    for i in range(cell.x, state.size):
-        for j in range(cell.y, state.size):
-            if state.board[i][j].value == "_":
-                queue.append(state.board[i][j])
+    copyState = copy.deepcopy(state)
+    for c in copyState.board[cell.x]:
+        if c.value == '_':
+            queue.append(c)
+    col = np.array(copyState.board).transpose()
+    for c in col[cell.y]:
+        if c.value == '_':
+            queue.append(c)
     while len(queue) > 0:
         cellCheck = queue.pop(0)
         for value in cellCheck.domain:
@@ -147,8 +161,8 @@ def AC3(state, cell):
                     if not check_constraints(state):
                         count += 1
                     if count == 2:
-                        cellCheck.domain.remove(value)
-                        print(cellCheck.domain)
+                        pass
+                        # cellCheck.domain.remove(value)
                 c.value = '_'
                 if len(cellCheck.domain) == 0:
                     return False
@@ -199,8 +213,9 @@ def backtracking_search(firstState):
     stack = [firstState]
     while True:
         state = stack.pop(-1)
-        print("*******")
-        state.print_board()
+        # print("*****")
+        # state.print_board()
+        # print("*****")
         if is_assignment_complete(state):
             state.print_board()
             return
@@ -212,20 +227,22 @@ def backtracking_search(firstState):
             if len(queue) == 2:
                 break
         cell = queue.pop(0)
-        if not FORWARD_CHECKING(state, cell):
-            continue
-        if not AC3(state, cell):
-            continue
         count = 0
+        # print("@@@@@@@@@@@@@@@@@@@@@@@@")
+        # print("cell that we are giving value to", cell.x, cell.y)
+        # state.print_board()
         for value in cell.domain:
             cell.value = value
             if check_constraints(state):
-                newState = copy.deepcopy(state)
-                stack.append(newState)
-                count += 1
+                if FORWARD_CHECKING(state, cell):
+                    # print("okkk good for value => ", value)
+                    newState = copy.deepcopy(state)
+                    stack.append(newState)
+                    count += 1
+            # else:
+            #     print("ok bad for value => ", value)
         if count == 2:
             s1, s2 = LCV_HEURISTIC(stack[-1], stack[-2], queue)
-            # print(s2, s1)
             if s2 > s1:
                 state1 = stack[-1]
                 state2 = stack[-2]
