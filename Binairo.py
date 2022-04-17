@@ -154,6 +154,7 @@ def AC3(state, cell):
             queue.append(c)
     while len(queue) > 0:
         cellCheck = queue.pop(0)
+        cellCheckCount = 0
         for value in cellCheck.domain:
             cellCheck.value = value
             for c in queue:
@@ -163,10 +164,9 @@ def AC3(state, cell):
                     if not check_constraints(state):
                         count += 1
                     if count == 2:
-                        pass
-                        # cellCheck.domain.remove(value)
+                        cellCheckCount += 1
                 c.value = '_'
-                if len(cellCheck.domain) == 0:
+                if cellCheckCount == 2:
                     return False
         cellCheck.value = '_'
     return True
@@ -210,8 +210,34 @@ def MRV_HEURISTIC(state: State):
                         cell.value = '_'
 
 
-def backtracking_search(firstState):
+def recursive_backtracking_search(state):
+    if is_assignment_complete(state):
+        state.print_board()
+        return
     queue = []
+    for row in state.board:
+        for cell in row:
+            if cell.value == '_':
+                queue.append(cell)
+        if len(queue) == 2:
+            break
+    cell = queue.pop(0)
+    for value in cell.domain:
+        cell.value = value
+        if check_constraints(state):
+            if is_assignment_complete(state):
+                state.print_board()
+                return
+            newState = copy.deepcopy(state)
+            if FORWARD_CHECKING(newState, newState.board[cell.x][cell.y]) and\
+                    AC3(newState, newState.board[cell.x][cell.y]):
+                recursive_backtracking_search(newState)
+    if is_assignment_complete(state):
+        state.print_board()
+        return
+
+
+def backtracking_search(firstState):
     stack = [firstState]
     while True:
         state = stack.pop(-1)
@@ -231,7 +257,8 @@ def backtracking_search(firstState):
             cell.value = value
             if check_constraints(state):
                 newState = copy.deepcopy(state)
-                if FORWARD_CHECKING(newState, newState.board[cell.x][cell.y]):
+                if FORWARD_CHECKING(newState, newState.board[cell.x][cell.y]) and\
+                        AC3(newState, newState.board[cell.x][cell.y]):
                     count += 1
                     stack.append(newState)
         if count == 2:

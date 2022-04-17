@@ -8,7 +8,7 @@ from State import *
 def main():
     input_numbers = []  # # first row = size of puzzle(n)  ## second row = number of cells that have color in the
     # statrt  (m)  ## row 3 to row 3+m :
-    input = open("input2.txt").readlines()
+    input = open("input3.txt").readlines()
     for line in input:
         line = line.rstrip()
         numbers = line.split(' ')
@@ -47,7 +47,8 @@ def main():
     # MRV_HEURISTIC(state)
     # print("board after second mrv heuristic")
     # state.print_board()
-    backtracking_search(state)
+    # backtracking_search(state)
+    recursive_backtracking_search(state)
     # backtracking_search(state)
     end_time = time()
     print('time: ', end_time - start_time)
