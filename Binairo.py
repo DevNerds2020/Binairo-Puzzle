@@ -219,8 +219,8 @@ def recursive_backtracking_search(state):
         state.print_board()
         return
     queue = []
-    for row in state.board:
-        for cell in row:
+    for row in reversed(state.board):
+        for cell in reversed(row):
             if cell.value == '_':
                 queue.append(cell)
         if len(queue) == 2:
