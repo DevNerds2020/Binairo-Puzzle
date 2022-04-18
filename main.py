@@ -48,9 +48,12 @@ def main():
     # print("board after second mrv heuristic")
     # state.print_board()
     # backtracking_search(state)
-    recursive_backtracking_search(state)
-    # backtracking_search(state)
+    # recursive_backtracking_search(state)
+    # end_time_recursive = time()
+    # print('time: ', end_time_recursive - start_time)
+    backtracking_search(state)
     end_time = time()
+    # print('time: ', end_time - end_time_recursive)
     print('time: ', end_time - start_time)
 
 

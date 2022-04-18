@@ -163,8 +163,8 @@ def AC3(state, cell):
                     c.value = v
                     if not check_constraints(state):
                         count += 1
-                    if count == 2:
-                        cellCheckCount += 1
+                if count == 2:
+                    cellCheckCount += 1
                 c.value = '_'
                 if cellCheckCount == 2:
                     return False
@@ -189,7 +189,8 @@ def LCV_HEURISTIC(state1, state2, queue):
 
 
 def MRV_HEURISTIC(state: State):
-    for i in range(5):
+    while True:
+        exists = False
         for row in state.board:
             for cell in row:
                 if cell.value == '_':
@@ -202,12 +203,15 @@ def MRV_HEURISTIC(state: State):
                     if check_constraints(state):
                         secondBool = True
                     if firstBool != secondBool:
+                        exists = True
                         if firstBool:
                             cell.value = 'w'
                         if secondBool:
                             cell.value = 'b'
                     else:
                         cell.value = '_'
+        if not exists:
+            break
 
 
 def recursive_backtracking_search(state):
@@ -225,16 +229,9 @@ def recursive_backtracking_search(state):
     for value in cell.domain:
         cell.value = value
         if check_constraints(state):
-            if is_assignment_complete(state):
-                state.print_board()
-                return
             newState = copy.deepcopy(state)
-            if FORWARD_CHECKING(newState, newState.board[cell.x][cell.y]) and\
-                    AC3(newState, newState.board[cell.x][cell.y]):
+            if FORWARD_CHECKING(newState, newState.board[cell.x][cell.y]):
                 recursive_backtracking_search(newState)
-    if is_assignment_complete(state):
-        state.print_board()
-        return
 
 
 def backtracking_search(firstState):
@@ -257,8 +254,7 @@ def backtracking_search(firstState):
             cell.value = value
             if check_constraints(state):
                 newState = copy.deepcopy(state)
-                if FORWARD_CHECKING(newState, newState.board[cell.x][cell.y]) and\
-                        AC3(newState, newState.board[cell.x][cell.y]):
+                if FORWARD_CHECKING(newState, newState.board[cell.x][cell.y]):
                     count += 1
                     stack.append(newState)
         if count == 2:
