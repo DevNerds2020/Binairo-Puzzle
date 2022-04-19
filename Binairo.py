@@ -214,34 +214,33 @@ def MRV_HEURISTIC(state: State):
             break
 
 
+def Mrv(state):
+    for row in state.board:
+        for cell in row:
+            blackBool = False
+            whiteBool = False
+            if cell.value == "_":
+                cell.value = 'w'
+                if check_constraints(state):
+                    whiteBool = True
+                cell.value = 'b'
+                if check_constraints(state):
+                    blackBool = True
+                cell.value = "_"
+                if whiteBool != blackBool:
+                    return cell
+    return None
+
+
 def recursive_backtracking_search(state):
+    # print("@@@@@")
+    # state.print_board()
     if is_assignment_complete(state):
         state.print_board()
         return
     queue = []
-    for row in reversed(state.board):
-        for cell in reversed(row):
-            if cell.value == '_':
-                queue.append(cell)
-        if len(queue) == 2:
-            break
-    cell = queue.pop(0)
-    for value in cell.domain:
-        cell.value = value
-        if check_constraints(state):
-            newState = copy.deepcopy(state)
-            if FORWARD_CHECKING(newState, newState.board[cell.x][cell.y]):
-                recursive_backtracking_search(newState)
-
-
-def backtracking_search(firstState):
-    stack = [firstState]
-    while True:
-        state = stack.pop(-1)
-        if is_assignment_complete(state):
-            state.print_board()
-            return
-        queue = []
+    cell = Mrv(state)
+    if cell is None:
         for row in state.board:
             for cell in row:
                 if cell.value == '_':
@@ -249,6 +248,34 @@ def backtracking_search(firstState):
             if len(queue) == 2:
                 break
         cell = queue.pop(0)
+    for value in cell.domain:
+        cell.value = value
+        if check_constraints(state):
+            newState = copy.deepcopy(state)
+            if FORWARD_CHECKING(newState, newState.board[cell.x][cell.y]):
+                recursive_backtracking_search(newState)
+    cell.value = "_"
+
+
+def backtracking_search(firstState):
+    stack = [firstState]
+    while True:
+        state = stack.pop(-1)
+        # print("@@@")
+        # state.print_board()
+        if is_assignment_complete(state):
+            state.print_board()
+            return
+        queue = []
+        cell = Mrv(state)
+        if cell is None:
+            for row in state.board:
+                for cell in row:
+                    if cell.value == '_':
+                        queue.append(cell)
+                if len(queue) == 2:
+                    break
+            cell = queue.pop(0)
         count = 0
         for value in cell.domain:
             cell.value = value
