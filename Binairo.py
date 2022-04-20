@@ -122,6 +122,7 @@ def FORWARD_CHECKING(state, cell):
     for c in col[cell.y]:
         if c.value == '_':
             queue.append(c)
+    passQueue = queue.copy()
     while len(queue) > 0:
         c = queue.pop(0)
         count = 0
@@ -139,22 +140,17 @@ def FORWARD_CHECKING(state, cell):
                 c.value = 'b'
         if count == 2:
             return False
-    return True
+    if AC3(state, passQueue):
+        return True
+    else:
+        return False
 
 
-def AC3(state, cell):
-    queue = []
-    copyState = copy.deepcopy(state)
-    for c in copyState.board[cell.x]:
-        if c.value == '_':
-            queue.append(c)
-    col = np.array(copyState.board).transpose()
-    for c in col[cell.y]:
-        if c.value == '_':
-            queue.append(c)
+def AC3(state, queue):
     while len(queue) > 0:
-        cellCheck = queue.pop(0)
+        cellCheck = queue.pop(-1)
         cellCheckCount = 0
+        blockedValues = []
         for value in cellCheck.domain:
             cellCheck.value = value
             for c in queue:
@@ -164,10 +160,22 @@ def AC3(state, cell):
                     if not check_constraints(state):
                         count += 1
                 if count == 2:
+                    blockedValues.append(value)
                     cellCheckCount += 1
-                c.value = '_'
+                    break
+                if len(c.domain) == 1 and count == 1:
+                    blockedValues.append(value)
+                    cellCheckCount += 1
+                    break
                 if cellCheckCount == 2:
                     return False
+                if cellCheckCount == 1 and len(cellCheck.domain) == 1:
+                    return False
+        if cellCheckCount == 1:
+            if blockedValues[0] == 'b':
+                cellCheck.value = 'w'
+            if blockedValues[0] == 'w':
+                cellCheck.value = 'b'
         cellCheck.value = '_'
     return True
 
@@ -239,7 +247,8 @@ def recursive_backtracking_search(state):
         state.print_board()
         return
     queue = []
-    cell = Mrv(state)
+    # cell = Mrv(state)
+    cell = None
     if cell is None:
         for row in state.board:
             for cell in row:
@@ -267,7 +276,7 @@ def backtracking_search(firstState):
             state.print_board()
             return
         queue = []
-        cell = Mrv(state)
+        cell = None
         if cell is None:
             for row in state.board:
                 for cell in row:

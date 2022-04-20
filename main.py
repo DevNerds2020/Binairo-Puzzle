@@ -51,7 +51,7 @@ def main():
     # recursive_backtracking_search(state)
     # end_time_recursive = time()
     # print('time: ', end_time_recursive - start_time)
-    recursive_backtracking_search(state)
+    backtracking_search(state)
     end_time = time()
     # print('time: ', end_time - end_time_recursive)
     print('time: ', end_time - start_time)
